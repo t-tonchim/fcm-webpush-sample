@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Firebase Push Test</title>
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+<p>Firebase Cloud Messaging Sample</p>
+
+<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDc7fD24o3poI_DEXtKu6FdT1qV6UBn1w4",
+    authDomain: "webpush-sample-2228e.firebaseapp.com",
+    databaseURL: "https://webpush-sample-2228e.firebaseio.com",
+    projectId: "webpush-sample-2228e",
+    storageBucket: "webpush-sample-2228e.appspot.com",
+    messagingSenderId: "801294869684"
+  };
+  firebase.initializeApp(config);
+  messaging = firebase.messaging();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./serviceworker.js')
+    .then(() => {
+      return navigator.serviceWorker.ready;
+    }).catch(e => {
+      console.error(e)
+    }).then(registration => {
+      messaging.useServiceWorker(registration)
+      messaging.requestPermission().then(() => {
+        console.log('Notification permission granted.');
+
+        messaging.getToken().then(token => {
+          console.log(token)
+          fetch('/send_message', {
+            method: 'POST',
+            body: token
+          })
+        }).catch(e => {
+          console.error(e)
+        })
+
+      }).catch(e => {
+        console.log('Unable to get permission to notify.', e)
+      })
+    });
+}
+</script>
+</body>
+</html>
